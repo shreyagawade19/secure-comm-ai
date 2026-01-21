@@ -1,48 +1,109 @@
+# ===============================
+# Streamlit Dashboard
+# AI-Based Secure Communication
+# ===============================
+
 import sys
 from pathlib import Path
+import random
+import streamlit as st
 
-# Add project root to Python path
+# --- Fix Python path for Streamlit Cloud ---
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.append(str(BASE_DIR))
 
-import streamlit as st
-import random
-
+# --- Project imports ---
 from encryption.aes_encrypt import generate_key, encrypt_data, decrypt_data
 from ai_model.anomaly_model import detect
 
-st.set_page_config(page_title="Secure Comm AI Dashboard", layout="centered")
+
+# ===============================
+# Streamlit Page Config
+# ===============================
+st.set_page_config(
+    page_title="AI-Based Secure Communication",
+    layout="centered"
+)
 
 st.title("🛡️ AI-Based Secure Communication Dashboard")
-st.markdown("Defense-oriented secure communication monitoring system")
+st.caption("Defense-oriented secure communication monitoring system")
 
 st.divider()
 
-# Input message
+# ===============================
+# Session State (History)
+# ===============================
+if "history" not in st.session_state:
+    st.session_state.history = []
+
+# ===============================
+# User Inputs
+# ===============================
+st.subheader("📨 Message Payload (Encrypted)")
 message = st.text_input(
-    "📡 Enter message to transmit",
+    "Enter message to transmit",
     "Secure military telemetry data"
 )
 
+st.subheader("📡 Communication Behavior Simulation")
+
+traffic_mode = st.radio(
+    "Select traffic behavior (simulation)",
+    [
+        "Normal Communication",
+        "Repetitive / Replay-like Pattern",
+        "High-Volume Traffic Spike"
+    ]
+)
+
+st.info(
+    "ℹ️ Message content is never analyzed by AI. "
+    "Only communication behavior (metadata) is evaluated."
+)
+
+# ===============================
+# Send Button
+# ===============================
 if st.button("🔐 Send Secure Message"):
 
-    # Encryption
+    # --- Encrypt message ---
     key = generate_key()
     encrypted_msg = encrypt_data(message, key)
 
-    # Metadata (must match training features)
-    packet_features = [
-        random.uniform(0.1, 1),        # dur
-        len(encrypted_msg),            # sbytes
-        len(encrypted_msg) * 0.8,      # dbytes
-        64                              # sttl
-    ]
+    # --- Generate packet features based on behavior ---
+    if traffic_mode == "Normal Communication":
+        packet_features = [
+            0.6,     # duration
+            120,     # source bytes
+            100,     # destination bytes
+            64       # TTL
+        ]
 
+    elif traffic_mode == "Repetitive / Replay-like Pattern":
+        packet_features = [
+            0.05,
+            300,
+            300,
+            64
+        ]
+
+    else:  # High-Volume Traffic Spike
+        packet_features = [
+            2.5,
+            5000,
+            4800,
+            255
+        ]
+
+    # --- AI Decision ---
     status = detect(packet_features)
 
+    # ===============================
+    # AI Analysis Output
+    # ===============================
     st.subheader("📊 AI Analysis Result")
 
-    st.write("**Packet Features Used:**")
+    st.write("**Packet Features Used (Metadata):**")
     st.json({
         "Duration (dur)": packet_features[0],
         "Source Bytes (sbytes)": packet_features[1],
@@ -50,16 +111,48 @@ if st.button("🔐 Send Secure Message"):
         "TTL (sttl)": packet_features[3]
     })
 
+    st.subheader("🧠 AI Reasoning")
+
     if "Normal" in status:
-        st.success("✅ Communication is NORMAL")
+        st.success("✅ AI Decision: Communication Allowed")
+        st.write(
+            "✔ Traffic behavior closely matches learned normal patterns."
+        )
 
         decrypted_msg = decrypt_data(encrypted_msg, key)
         st.subheader("🔓 Decrypted Message")
         st.code(decrypted_msg)
 
     else:
-        st.error("🚨 SUSPICIOUS communication detected!")
-        st.warning("Message blocked for security reasons")
+        st.error("🚨 AI Decision: Suspicious Communication Detected")
+        st.write(
+            "⚠ Traffic behavior deviates significantly from learned normal patterns."
+        )
+        st.warning(
+            "Message blocked for security review. "
+            "In real systems, this would trigger secondary verification."
+        )
+
+    # ===============================
+    # Update History
+    # ===============================
+    st.session_state.history.append({
+        "Message": message,
+        "Traffic Pattern": traffic_mode,
+        "AI Decision": "Allowed" if "Normal" in status else "Blocked"
+    })
+
+# ===============================
+# Communication History
+# ===============================
+if st.session_state.history:
+    st.divider()
+    st.subheader("📈 Communication History (Current Session)")
+    st.table(st.session_state.history)
 
 st.divider()
-st.caption("AI monitors encrypted traffic behavior without inspecting payload data")
+
+st.caption(
+    "🔒 This system prioritizes security over convenience. "
+    "Anomaly detection is intentionally conservative."
+)
