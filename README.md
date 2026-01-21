@@ -74,6 +74,10 @@ Secure decryption only for trusted communication
 
 This project is deployed using Streamlit Community Cloud, making it accessible as a real-time web application without any local setup.
 
+## 🌐 Live Demo
+👉 Streamlit App:  
+https://secure-comm-ai-ejkrrfa99jerc63vv3w8qm.streamlit.app/
+
 🔒 Dataset Notice
 
 Large training datasets (e.g., network_logs.csv) are intentionally excluded from this repository and kept locally to maintain repository cleanliness and comply with GitHub file size limits.
