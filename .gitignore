@@ -1,0 +1,6 @@
+data/network_logs.csv
+data/*.csv
+venv/
+__pycache__/
+*.pyc
+.env
