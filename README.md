@@ -70,36 +70,6 @@ Automatic blocking of suspicious communication
 
 Secure decryption only for trusted communication
 
-🗂️ Project Structure
-Secure_Comm_AI_Defense/
-│
-├── ai_model/
-│   ├── anomaly_model.py
-│   ├── anomaly_model.pkl
-│
-├── encryption/
-│   ├── aes_encrypt.py
-│
-├── dashboard/
-│   └── monitor.py
-│
-├── sender/
-│   └── sender.py
-│
-├── receiver/
-│   └── receiver.py
-│
-├── requirements.txt
-├── README.md
-└── .gitignore
-
-▶️ How to Run Locally
-1️⃣ Install dependencies
-pip install -r requirements.txt
-
-2️⃣ Run the Streamlit dashboard
-streamlit run dashboard/monitor.py
-
 🌍 Deployment
 
 This project is deployed using Streamlit Community Cloud, making it accessible as a real-time web application without any local setup.
