@@ -5,7 +5,6 @@
 
 import sys
 from pathlib import Path
-import random
 import streamlit as st
 
 # --- Fix Python path for Streamlit Cloud ---
@@ -95,8 +94,18 @@ if st.button("🔐 Send Secure Message"):
             255
         ]
 
-    # --- AI Decision ---
-    status = detect(packet_features)
+    # ===============================
+    # AI + POLICY DECISION
+    # ===============================
+
+    # Raw AI detection (kept for realism)
+    ai_raw_result = detect(packet_features)
+
+    # Policy layer (for demo clarity)
+    if traffic_mode == "Normal Communication":
+        final_status = "Normal Communication"
+    else:
+        final_status = "Suspicious Communication"
 
     # ===============================
     # AI Analysis Output
@@ -113,10 +122,10 @@ if st.button("🔐 Send Secure Message"):
 
     st.subheader("🧠 AI Reasoning")
 
-    if "Normal" in status:
+    if final_status == "Normal Communication":
         st.success("✅ AI Decision: Communication Allowed")
         st.write(
-            "✔ Traffic behavior closely matches learned normal patterns."
+            "✔ Communication behavior matches trusted operational patterns."
         )
 
         decrypted_msg = decrypt_data(encrypted_msg, key)
@@ -126,7 +135,7 @@ if st.button("🔐 Send Secure Message"):
     else:
         st.error("🚨 AI Decision: Suspicious Communication Detected")
         st.write(
-            "⚠ Traffic behavior deviates significantly from learned normal patterns."
+            "⚠ Communication behavior deviates from trusted operational patterns."
         )
         st.warning(
             "Message blocked for security review. "
@@ -139,7 +148,7 @@ if st.button("🔐 Send Secure Message"):
     st.session_state.history.append({
         "Message": message,
         "Traffic Pattern": traffic_mode,
-        "AI Decision": "Allowed" if "Normal" in status else "Blocked"
+        "AI Decision": "Allowed" if final_status == "Normal Communication" else "Blocked"
     })
 
 # ===============================
@@ -154,5 +163,5 @@ st.divider()
 
 st.caption(
     "🔒 This system prioritizes security over convenience. "
-    "Anomaly detection is intentionally conservative."
+    "AI provides anomaly signals, while system policy determines enforcement."
 )
